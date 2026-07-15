@@ -1,0 +1,54 @@
+# UpCart — gotchas
+
+## Shadow DOM vs light DOM
+- "Render Cart in Shadow DOM" (Settings → Advanced Settings) is **OFF by default** → the
+  cart is in the **light DOM**, theme CSS reaches it, and `document.querySelector` finds
+  cart elements.
+- If a store turns it **ON**, the cart is isolated: theme CSS no longer styles it (put cart
+  CSS in the UpCart **Custom CSS** field) and `document.querySelector` will **not** find
+  cart elements.
+- **Always** root cart JS at `window.upcartDocumentOrShadowRoot || document` so it works in
+  either mode. Only use plain `document` for elements **outside** the cart (theme header,
+  etc.).
+
+## Selectors change between versions
+- `.upcart-*` are documented, comparatively stable hooks — prefer them.
+- Hashed `styles_*__` build classes (V1) are internal and can change when UpCart updates the
+  cart build. Don't hard-depend on them; verify against the live drawer.
+
+## Deprecated single-assignment callbacks
+- `window.upcartOnCartLoaded`, `upcartOnCartUpdated`, `upcartOnItemRemoved`,
+  `upcartOnAddUpsell`, `upcartOnAddToCart` are **assignments** — the last script to set one
+  wins, silently disabling any earlier handler (yours or another app's). Use the
+  `upcartSubscribe*` equivalents instead.
+
+## DOM re-render wipes injected markup
+- UpCart rebuilds the line-item DOM on every cart change. Anything you inject (a badge, a
+  row, a custom control) disappears on the next render. Re-apply it inside your
+  `upcartSubscribe*` callback and guard against double-inject (e.g. a claimed `data-*` flag),
+  plus a `MutationObserver` fallback for renders not tied to a subscribed event.
+
+## Cart line identity
+- A line item's DOM element `id` equals its Shopify **cart line key** (`<variantId>:<hash>`),
+  which is what `POST /cart/change.js` expects as `id`. You can map a rendered row to its
+  cart line without a separate lookup.
+
+## No Liquid in Custom HTML
+- Custom HTML modules render raw HTML/JS/CSS, **not** Liquid. Get live data at runtime from
+  `/cart.js` and `/products/{handle}.js`; never expect `{{ ... }}` to interpolate.
+
+## Coexistence with free-gift / GWP logic
+- Free-gift-with-purchase logic (theme scripts or Shopify Flow) that adds `$0` lines will
+  fight the cart if not accounted for: exclude gift/bundle handles from upsells via
+  `upcartModifyListOfUpsells`, and **never ADD items** from a cart-load/update handler
+  (adding on every load loops). Removing/capping is safe; adding is not.
+
+## Subscription (selling-plan) pricing
+- A subscription discount is a selling-plan price adjustment, **not** `compare_at_price` and
+  **not** a line discount. If you compute a "was/now" saving, the pre-discount unit price is
+  in `selling_plan_allocation.compare_at_price`, not `compare_at_price` / `original_price`.
+
+## The meter is visual only
+- UpCart's free-shipping/rewards meter does not grant shipping. A matching real
+  free-shipping rate (or automatic discount) must exist in Shopify Admin, or the bar
+  promises something checkout won't honor.

@@ -30,8 +30,9 @@ upcart/
 The `output-contract.md` doc is the key rule: for cart work TF must emit paste-ready files
 (Custom CSS field, before-load scripts, one Custom HTML block per named slot) plus an
 implementation guide — and must **not** create a theme snippet, a `settings_schema.json`
-panel, or a `frontend/` entrypoint for the cart. See `USAGE.md` for the reference output shape
-(the pattern matches the hand-built Llama Naturals cart PR).
+panel, or a `frontend/` entrypoint for the cart. See `knowledge/output-contract.md` →
+"Files to emit" for the reference output shape (the pattern matches the hand-built Llama
+Naturals cart PR).
 
 All knowledge is intentionally **general and reusable** — no store-specific IDs, handles, or
 thresholds (those are per-store dashboard values).

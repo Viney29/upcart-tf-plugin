@@ -14,7 +14,9 @@ not theme assets that get wired into the running theme.
 
 ## Files to emit (mirror this naming)
 
-Write these into the repo's docs folder (`docs/`), **one artifact per dashboard destination**:
+Write these into the repo's docs folder (`docs/`). Emit **one file per block/artifact** — note
+that several blocks may target the **same** Custom HTML slot (in the reference cart, Blocks F
+and G are separate files both pasted into "Bottom of cart," one after the other):
 
 | File | Pastes into |
 |---|---|
@@ -23,14 +25,21 @@ Write these into the repo's docs folder (`docs/`), **one artifact per dashboard 
 | `docs/upcart-block-<x>-<name>.html` | UpCart → Custom HTML → **\<named location\>** (one file per block) |
 | `docs/upcart-cart-design-implementation.md` | the human guide — not pasted anywhere |
 
-- **One file per dashboard field / Custom HTML slot.** Give each block a stable letter + name
-  (Block B = top panel, Block C = trust row, Block E = empty cart, Block F = frequency select,
-  Block G = subtotal "was", …) and name the exact slot in its header comment.
-- **The first line of every file is a paste header**, e.g.
-  `<!-- Block C — trust row. Paste at UpCart Custom HTML "Below checkout button". -->`.
+- **Give each block a stable letter + name** (Block B = top panel, Block C = trust row,
+  Block E = empty cart, Block F = frequency select, Block G = subtotal "was", …) and name the
+  exact slot in its header comment.
+- **The first line of every file is a paste header**, in the comment syntax native to that file
+  type — `/* … */` for the `.css` field file, `<!-- … -->` for the HTML block / before-load
+  files — naming the exact UpCart destination. Examples:
+  `<!-- Block C — trust row. Paste at UpCart Custom HTML "Below checkout button". -->` /
+  `/* UpCart → Settings → Custom CSS — paste this whole file into that field. */`.
   The developer must never have to guess where a file goes.
-- The Custom CSS field file styles **only UpCart's native elements**. Net-new markup carries
-  its own `<style>` inside its block file — say so in a comment, so nobody double-pastes it.
+- The Custom CSS field file styles UpCart's **native** elements, **plus** any injected-element
+  styling that has to interleave with native selectors (e.g. a combinator like
+  `.styles_Footer__cartSubtotalValue__ + .ln-subtotal-was`, or overrides that must beat native
+  specificity). When a block's styling lives in the CSS field, that block **omits its own
+  `<style>`** and says so in a comment. Otherwise, self-contained net-new markup carries its
+  own `<style>` inside its block file — say so, so nobody double-pastes it.
 
 ## The implementation guide MUST contain
 
@@ -58,28 +67,35 @@ exists to avoid. A single documented constant at the top of a script (e.g.
 
 ## PROHIBITED for cart UI (this is how the plugin fails)
 
-To customize the UpCart cart, **never** do any of these — each one wrongly pushes UpCart
-config into the theme:
+To customize the UpCart cart, **never** create or edit any of these theme surfaces — each one
+wrongly pushes UpCart config into the theme:
 
-- ❌ Create a theme snippet (`snippets/upcart-*.liquid`) or render one from `layout/theme.liquid`.
-- ❌ Add cart-enhancement settings to `config/settings_schema.json`.
-- ❌ Add a `frontend/entrypoints/*` or `frontend/scripts/lib/*` module (or an import-map entry,
-  or a compiled `assets/sc--*` bundle) for the cart.
-- ❌ Dump Figma-exported SVGs / logos into `assets/`. Inline icons as `<svg>` or a `data:` URI
+- ❌ A theme snippet (`snippets/upcart-*.liquid`) — whether or not it is rendered from `layout/theme.liquid`.
+- ❌ A theme **section** (`sections/*.liquid`) or **theme-app-extension block** (`blocks/*`).
+  An empty-cart message, a trust row, or a per-line selector is a **Custom HTML block**, not a
+  theme section/app-block.
+- ❌ `config/settings_schema.json` (a cart settings panel) **or** `config/settings_data.json`
+  (its saved values — editing it also risks clobbering unrelated app-embed blocks, as a past
+  run did to a fraud-protection embed).
+- ❌ A `frontend/entrypoints/*` or `frontend/scripts/lib/*` module (or an import-map entry, or a
+  compiled `assets/sc--*` bundle) for the cart.
+- ❌ Figma-exported SVGs / logos dumped into `assets/`. Inline icons as `<svg>` or a `data:` URI
   **inside the block that uses them** — they render in the dashboard drawer, not the theme.
-- ❌ Use Liquid inside any block. Dashboard Custom HTML is **not** Liquid; read live data with
+- ❌ Liquid inside any block. Dashboard Custom HTML is **not** Liquid; read live data with
   `/cart.js` and `/products/{handle}.js`, mutate with `POST /cart/change.js`.
 
-If you find yourself editing `layout/theme.liquid`, `config/settings_schema.json`, or adding a
-`frontend/` lib for cart work — **stop**. That output belongs in a `docs/` file for the
-dashboard.
+**Hard STOP self-check:** if you are about to create or edit **any theme file for the cart** —
+anything under `snippets/`, `sections/`, `blocks/`, `layout/`, `config/`, `frontend/`, or a
+cart `assets/*` — stop. That output belongs in a `docs/` file for the dashboard.
 
 ## The only theme-side exceptions
 
-1. **One optional theme CSS hook file** (e.g.
-   `frontend/styles/components/upcart-cart-drawer.css`) *if the store already keeps one*. Even
-   then the **Custom CSS field file is canonical** — label the theme copy "legacy" and do not
-   fork styling across both.
+1. **A pre-existing theme cart-CSS file** (e.g.
+   `frontend/styles/components/upcart-cart-drawer.css`). The restyle's sole home is
+   `docs/upcart-custom-css-field.css`; do **not** create a new `frontend/styles/*` file when
+   none exists, and do **not** copy the restyle into a theme file. If such a file already
+   exists, it may only receive a "moved to the UpCart Custom CSS field" pointer/comment (or be
+   emptied) — the **Custom CSS field file is canonical**; the theme copy is legacy and must not
+   fork or duplicate the styling.
 2. Genuinely theme-side behavior UpCart cannot own: an **add-to-cart trigger that opens the
    UpCart drawer**, or a theme element **outside** the cart. Never the cart's own UI.
-</content>

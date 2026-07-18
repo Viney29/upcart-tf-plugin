@@ -23,7 +23,7 @@ for you, listed below (the same split as the Shoplift plugin's "what TF does NOT
 | Avoids building a native cart | Recognizes UpCart owns the drawer; won't scaffold/restyle a competing theme cart or mini-cart |
 | Avoids theme-wiring the cart | Won't add a `snippets/upcart-*.liquid` in `theme.liquid`, a `settings_schema.json` panel, a `frontend/` entrypoint/lib, or compiled `assets/sc--*` for cart UI — that config lives in the dashboard |
 | Doesn't duplicate cart features | Won't add a second rewards bar, in-cart upsell, or subscription selector |
-| Theme-side hooks (only the narrow exceptions) | An add-to-cart trigger that opens the UpCart drawer; at most one optional/legacy theme cart-CSS hook file |
+| Theme-side hooks (only the narrow exceptions) | An add-to-cart trigger that opens the UpCart drawer. The restyle's sole home is `docs/upcart-custom-css-field.css` (canonical); TF won't create a new theme cart-CSS file, and only points/empties a pre-existing one — never copies the restyle into it |
 | Correct cart JS patterns | Roots queries at `upcartDocumentOrShadowRoot`; uses `upcartSubscribe*` / `aftersell-upcart:public-events:*`; re-applies injected DOM on re-render; verified `.upcart-*` selectors |
 
 ## 2. What TF does NOT do (manual — in the UpCart dashboard)

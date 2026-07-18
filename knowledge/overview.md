@@ -14,9 +14,10 @@ and is configured almost entirely in the **UpCart dashboard**, not in theme code
    `customization.md`). TF **cannot** edit the dashboard — dashboard work is a **manual
    step** for the merchant/developer (list it in the plan, do not try to emit it as theme
    files).
-2. **Theme (small surface).** The theme only holds the UpCart **app embed** (installed by
-   the app) and, optionally, a store-chosen CSS/JS hook file if the team keeps cart styling
-   in the theme instead of the dashboard field. Everything the drawer shows is UpCart's.
+2. **Theme (tiny surface).** The theme only holds the UpCart **app embed** (installed by the
+   app) and, at most, a **legacy, optional** cart-CSS hook file *if the store already keeps
+   one* — the UpCart **Custom CSS field remains canonical** (see `output-contract.md`). TF does
+   **not** add theme JS for the cart. Everything the drawer shows is UpCart's.
 
 By default UpCart renders in the **light DOM** ("Render Cart in Shadow DOM" is OFF), so its
 elements are in the normal page and theme CSS can reach them. If a store turns Shadow DOM
@@ -59,11 +60,12 @@ ON, the cart is isolated (see `gotchas.md`).
 ## What the agent MUST NOT do
 
 - Build or restyle a competing native theme cart / mini-cart / slide cart.
-- **Wire UpCart cart customizations into the theme** — a `snippets/upcart-*.liquid` rendered
-  from `layout/theme.liquid`, a `config/settings_schema.json` panel for cart config, a
-  `frontend/` entrypoint/lib + import-map entry, compiled `assets/sc--*` bundles, or dumped
-  Figma SVGs in `assets/`. That is the single biggest failure mode: cart config goes to the
-  **dashboard** as `docs/` paste files (see `output-contract.md`), not into the theme bundle.
+- **Wire UpCart cart customizations into the theme** — a `snippets/upcart-*.liquid`, a
+  `sections/*.liquid` or theme-app-extension `blocks/*`, a `config/settings_schema.json` panel
+  or `config/settings_data.json` values, a `frontend/` entrypoint/lib + import-map entry,
+  compiled `assets/sc--*` bundles, or dumped Figma SVGs in `assets/`. That is the single
+  biggest failure mode: cart config goes to the **dashboard** as `docs/` paste files (see
+  `output-contract.md`), not into the theme bundle.
 - Assume Liquid works inside UpCart Custom HTML (it does not — fetch `/cart.js` instead).
 - Use the deprecated single-assignment `window.upcartOnCartLoaded` / `upcartOnCartUpdated`
   callbacks (they clobber each other and other apps — use `upcartSubscribe*`).

@@ -31,10 +31,14 @@ ON, the cart is isolated (see `gotchas.md`).
 - **Do NOT duplicate UpCart features.** UpCart already provides the free-shipping/rewards
   meter, in-cart upsells ("Frequently Bought Together"), and subscription selectors. Don't
   add a second one in the theme; configure or restyle UpCart's.
-- **Route cart changes to the right layer.** Visual/behaviour changes belong in the UpCart
-  **Custom CSS / Custom HTML** (a manual dashboard step — surface it clearly). Only write
-  **theme** code for genuinely theme-side needs (e.g. an add-to-cart trigger that must open
-  the UpCart drawer, or a store's chosen theme-side cart CSS hook file).
+- **Route cart changes to the right layer, and ship them as dashboard-paste files.** Visual /
+  markup / behaviour changes belong in UpCart **Custom CSS / Custom HTML**, delivered as
+  paste-ready files under `docs/` plus an implementation guide — see **`output-contract.md`**
+  for the exact file set, naming, and guide contents. Do **NOT** wire cart UI into the theme:
+  no `snippets/upcart-*.liquid` rendered from `layout/theme.liquid`, no
+  `config/settings_schema.json` panel, no `frontend/` entrypoint or lib, no compiled
+  `assets/sc--*`. Write **theme** code only for the narrow non-cart exceptions in
+  `output-contract.md` (e.g. an add-to-cart trigger that must open the UpCart drawer).
 - **Use UpCart's own selectors, verified live.** Target the documented `.upcart-*` classes;
   confirm against the live drawer before relying on any class (see `gotchas.md`).
 
@@ -42,16 +46,26 @@ ON, the cart is isolated (see `gotchas.md`).
 
 1. Detect that the cart is UpCart before touching anything cart-related; if a task says
    "cart drawer / mini-cart / slide cart," assume UpCart owns it.
-2. Put visual/markup cart changes into UpCart Custom CSS / Custom HTML and **flag them as
-   manual dashboard steps** in the plan.
-3. Root any cart-querying JS at `window.upcartDocumentOrShadowRoot || document`.
-4. React to cart changes with the `upcartSubscribe*` API, and re-apply injected DOM on each
-   cart event (UpCart rebuilds the line DOM on every change).
+2. Deliver cart customizations as **paste-ready `docs/` files + an implementation guide**, one
+   artifact per UpCart dashboard field / Custom HTML slot, and **flag the paste itself as a
+   manual dashboard step**. Follow **`output-contract.md`** exactly.
+3. Root any cart-querying JS at `window.upcartDocumentOrShadowRoot || document`, and target
+   documented `.upcart-*` / confirmed V1 `styles_*__` classes — **verified against the live
+   drawer**, not guessed with `[class*="…"]` fallback chains.
+4. React to cart changes with the `upcartSubscribe*` API (or the
+   `aftersell-upcart:public-events:*` events), and re-apply injected DOM on each cart event
+   (UpCart rebuilds the line DOM on every change).
 
 ## What the agent MUST NOT do
 
 - Build or restyle a competing native theme cart / mini-cart / slide cart.
+- **Wire UpCart cart customizations into the theme** — a `snippets/upcart-*.liquid` rendered
+  from `layout/theme.liquid`, a `config/settings_schema.json` panel for cart config, a
+  `frontend/` entrypoint/lib + import-map entry, compiled `assets/sc--*` bundles, or dumped
+  Figma SVGs in `assets/`. That is the single biggest failure mode: cart config goes to the
+  **dashboard** as `docs/` paste files (see `output-contract.md`), not into the theme bundle.
 - Assume Liquid works inside UpCart Custom HTML (it does not — fetch `/cart.js` instead).
 - Use the deprecated single-assignment `window.upcartOnCartLoaded` / `upcartOnCartUpdated`
   callbacks (they clobber each other and other apps — use `upcartSubscribe*`).
-- Hard-depend on unstable `styles_*__` build classes when a `.upcart-*` hook exists.
+- Hard-depend on unstable `styles_*__` build classes when a `.upcart-*` hook exists, or guess
+  selectors with `[class*="…"]` chains instead of verifying against the live drawer.

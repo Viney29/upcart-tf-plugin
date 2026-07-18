@@ -11,19 +11,27 @@ Knowledge-only (no `tools.ts`, no `storeSettings`), following the same shape as 
 
 UpCart is different from an SDK-style integration: it **owns the cart UI** and is configured
 mostly in its **dashboard**, not in theme code. So the plugin's job is mainly *knowledge* —
-tell the agents what UpCart is, that it owns the cart, how to extend it correctly, and which
-work is a manual dashboard step.
+tell the agents what UpCart is, that it owns the cart, how to extend it correctly, and **what
+to ship**: paste-ready dashboard files under `docs/` + an implementation guide, *not* theme
+wiring.
 
 ```
 upcart/
   plugins.json              # manifest — the `description` is what the LLM selector reads
   knowledge/
     overview.md             # what UpCart is; owns the cart; MUST / MUST NOT
+    output-contract.md      # ★ the deliverable: docs/ paste files + guide; theme-wiring is PROHIBITED
     customization.md        # extension model (Custom CSS, Custom HTML x9, no Liquid) + Public JS API
-    gotchas.md              # shadow/light DOM, selector stability, deprecated callbacks, re-render, GWP, pricing
+    gotchas.md              # shadow/light DOM, selector stability, deprecated callbacks, re-render, GWP, pricing, data-URI safety
   USAGE.md                  # human notes: prerequisites + manual dashboard steps
   README.md
 ```
+
+The `output-contract.md` doc is the key rule: for cart work TF must emit paste-ready files
+(Custom CSS field, before-load scripts, one Custom HTML block per named slot) plus an
+implementation guide — and must **not** create a theme snippet, a `settings_schema.json`
+panel, or a `frontend/` entrypoint for the cart. See `USAGE.md` for the reference output shape
+(the pattern matches the hand-built Llama Naturals cart PR).
 
 All knowledge is intentionally **general and reusable** — no store-specific IDs, handles, or
 thresholds (those are per-store dashboard values).

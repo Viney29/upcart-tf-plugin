@@ -15,14 +15,16 @@ for you, listed below (the same split as the Shoplift plugin's "what TF does NOT
 - **A real free-shipping rate exists in Shopify** if you show a free-shipping meter — the
   meter is visual only.
 
-## 1. What TF does (automatic, theme-side)
+## 1. What TF produces (automatic — as `docs/` paste files, not theme code)
 
 | What | How |
 |---|---|
+| **The deliverable** | Paste-ready files under `docs/` — Custom CSS field, "before cart loads" scripts, one Custom HTML block per named slot — **plus `docs/upcart-cart-design-implementation.md`** (paste-map, module on/off matrix, dashboard settings, gotchas). See `knowledge/output-contract.md`. |
 | Avoids building a native cart | Recognizes UpCart owns the drawer; won't scaffold/restyle a competing theme cart or mini-cart |
+| Avoids theme-wiring the cart | Won't add a `snippets/upcart-*.liquid` in `theme.liquid`, a `settings_schema.json` panel, a `frontend/` entrypoint/lib, or compiled `assets/sc--*` for cart UI — that config lives in the dashboard |
 | Doesn't duplicate cart features | Won't add a second rewards bar, in-cart upsell, or subscription selector |
-| Theme-side cart hooks (only if asked) | Add-to-cart triggers that open the UpCart drawer; a store's chosen theme-side cart CSS/JS hook file |
-| Correct cart JS patterns | Roots queries at `upcartDocumentOrShadowRoot`; uses `upcartSubscribe*`; re-applies injected DOM on re-render |
+| Theme-side hooks (only the narrow exceptions) | An add-to-cart trigger that opens the UpCart drawer; at most one optional/legacy theme cart-CSS hook file |
+| Correct cart JS patterns | Roots queries at `upcartDocumentOrShadowRoot`; uses `upcartSubscribe*` / `aftersell-upcart:public-events:*`; re-applies injected DOM on re-render; verified `.upcart-*` selectors |
 
 ## 2. What TF does NOT do (manual — in the UpCart dashboard)
 

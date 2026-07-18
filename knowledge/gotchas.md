@@ -15,6 +15,20 @@
 - `.upcart-*` are documented, comparatively stable hooks — prefer them.
 - Hashed `styles_*__` build classes (V1) are internal and can change when UpCart updates the
   cart build. Don't hard-depend on them; verify against the live drawer.
+- **Don't guess selectors.** Chains like `root.querySelector('[class*="emptyCart"]') || …` are a
+  smell — they mean the live DOM wasn't inspected. Confirm the real class against the live V1
+  drawer and target that. A guessed selector that silently matches nothing produces a block
+  that "runs" but injects nowhere.
+- **V1 → V2 is a breaking rename.** V1 uses `styles_*__` + `.upcart-*`; a V2 migration moves to
+  `.upcart-public-*` / `data-*`. State the version in the implementation guide and re-audit all
+  CSS + block scripts if the store is ever upgraded.
+
+## Data-URI SVGs can smuggle scripts
+- Icons pasted into the Custom CSS field or a Custom HTML block as `data:image/svg+xml,…` are
+  live markup. A copied blob can carry an inline `<script>` / event handler alongside the path.
+  **Audit every `data:` SVG before shipping it** — keep only the `<svg>`/`<path>` shape, strip
+  anything executable. (A real UpCart CSS field was found shipping a dropdown-chevron data-URI
+  with an embedded geolocation-spoofer script.)
 
 ## Deprecated single-assignment callbacks
 - `window.upcartOnCartLoaded`, `upcartOnCartUpdated`, `upcartOnItemRemoved`,

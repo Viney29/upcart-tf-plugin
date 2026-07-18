@@ -1,7 +1,9 @@
 # UpCart — customization model & Public API
 
-Everything below is set in the **UpCart dashboard** (a manual step for the developer) unless
-it is theme-side JS the task genuinely needs. Name the exact field/location in the plan.
+Everything below is configured in the **UpCart dashboard**. TF's deliverable is the
+**paste-ready content for each field, as `docs/` files, plus an implementation guide** — see
+**`output-contract.md`** for the required file set, block naming, and the theme-wiring
+prohibitions. Name the exact field / Custom HTML location for every artifact you produce.
 
 ## Extension points
 

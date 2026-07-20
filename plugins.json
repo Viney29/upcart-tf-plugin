@@ -1,6 +1,6 @@
 {
   "name": "upcart",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "kind": "integration",
   "coreApi": "^1.0.0",
   "description": "UpCart (AfterSell) slide-out cart drawer for Shopify themes. Use when a task involves the cart drawer / mini-cart / slide cart, in-cart upsells or 'Frequently Bought Together', the free-shipping / rewards progress meter, in-cart subscription or frequency selectors, or free-gift-with-purchase inside the cart. UpCart OWNS the cart UI: it renders in the storefront (light DOM by default) with its own classes and is configured mostly in the UpCart dashboard (Custom CSS + Custom HTML modules), so do NOT build or restyle a native theme cart drawer, mini-cart, or slide cart that competes with it. DELIVERABLE: paste-ready dashboard files under docs/ (Custom CSS field, before-load scripts, one Custom HTML block per named slot) PLUS an implementation guide (paste-map, module on/off matrix, dashboard settings) — this plugin does NOT wire cart UI into the theme (no snippet in theme.liquid, no settings_schema panel, no frontend entrypoint/lib, no compiled assets). NOT for Shopify checkout, and NOT for the /cart page template unless UpCart is disabled.",

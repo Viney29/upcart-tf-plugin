@@ -48,15 +48,15 @@ thresholds (those are per-store dashboard values).
 ## Develop & test
 
 ```bash
-tf run <task.md> --with-plugin /Users/b-mac/www/Tf-plugins/upcart-tf-plugin
+tf run <task.md> --with-plugin /path/to/upcart-tf-plugin
 # confirm: "[plugins] Engaged: upcart" in the output / logs/<runId>.log
 ```
 
 ## Install permanently
 
 ```bash
-# from the parent dir, zip the plugin folder then install
-cd /Users/b-mac/www/Tf-plugins && zip -r upcart.zip upcart-tf-plugin -x '*/.git/*' -x '*.DS_Store'
+# from the plugin's parent dir, zip the plugin folder then install
+zip -r upcart.zip upcart-tf-plugin -x '*/.git/*' -x '*.DS_Store'
 tf plugin install ./upcart.zip          # add --force to overwrite an existing install
 # installs to ~/.theme-factory/plugins/upcart/ (named by manifest `name`, not the zip)
 ```

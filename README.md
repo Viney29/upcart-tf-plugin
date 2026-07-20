@@ -19,10 +19,10 @@ wiring.
 upcart/
   plugins.json              # manifest — the `description` is what the LLM selector reads
   knowledge/
-    overview.md             # what UpCart is; owns the cart; MUST / MUST NOT
+    overview.md             # what UpCart is; owns the cart; CRITICAL rules + pointers into the detail files
     output-contract.md      # ★ the deliverable: docs/ paste files + guide; theme-wiring is PROHIBITED
     customization.md        # extension model (Custom CSS, Custom HTML x9, no Liquid) + Public JS API
-    gotchas.md              # shadow/light DOM, selector stability, deprecated callbacks, re-render, GWP, pricing, data-URI safety
+    gotchas.md              # shadow/light DOM + JS rooting, selector stability, deprecated callbacks, re-render, GWP, pricing, data-URI safety
   USAGE.md                  # human notes: prerequisites + manual dashboard steps
   README.md
 ```
@@ -48,7 +48,7 @@ thresholds (those are per-store dashboard values).
 ## Develop & test
 
 ```bash
-tf run <task.md> --with-plugin /Users/b-mac/www/upcart-tf-plugin
+tf run <task.md> --with-plugin /Users/b-mac/www/Tf-plugins/upcart-tf-plugin
 # confirm: "[plugins] Engaged: upcart" in the output / logs/<runId>.log
 ```
 
@@ -56,7 +56,7 @@ tf run <task.md> --with-plugin /Users/b-mac/www/upcart-tf-plugin
 
 ```bash
 # from the parent dir, zip the plugin folder then install
-cd /Users/b-mac/www && zip -r upcart.zip upcart-tf-plugin -x '*/.git/*'
+cd /Users/b-mac/www/Tf-plugins && zip -r upcart.zip upcart-tf-plugin -x '*/.git/*' -x '*.DS_Store'
 tf plugin install ./upcart.zip          # add --force to overwrite an existing install
 # installs to ~/.theme-factory/plugins/upcart/ (named by manifest `name`, not the zip)
 ```

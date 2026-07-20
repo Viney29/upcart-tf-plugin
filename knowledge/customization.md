@@ -1,9 +1,8 @@
 # UpCart — customization model & Public API
 
-Everything below is configured in the **UpCart dashboard**. TF's deliverable is the
-**paste-ready content for each field, as `docs/` files, plus an implementation guide** — see
-**`output-contract.md`** for the required file set, block naming, and the theme-wiring
-prohibitions. Name the exact field / Custom HTML location for every artifact you produce.
+Everything below is configured in the **UpCart dashboard**. Deliverables follow
+**`output-contract.md`** (paste-ready `docs/` files + implementation guide, no theme wiring).
+Name the exact field / Custom HTML location for every artifact you produce.
 
 ## Extension points
 
@@ -12,9 +11,8 @@ prohibitions. Name the exact field / Custom HTML location for every artifact you
 - **Use for:** restyling native cart elements. Target documented `.upcart-*` classes, e.g.
   `.upcart-header-text`, `.upcart-product-title`, `.upcart-item-price`,
   `.upcart-checkout-button`, `.upcart-upsells-title`, `.upcart-upsell-item-card`.
-- Prefer `.upcart-*` hooks. V1 builds also expose hashed `styles_*__` build classes; those
-  change between UpCart versions — only use them when no `.upcart-*` hook exists, and note
-  the fragility.
+- Prefer `.upcart-*` hooks over V1's hashed `styles_*__` build classes, and verify every
+  selector against the live drawer — see `gotchas.md` ("Selectors change between versions").
 
 ### Custom HTML modules
 - **Where:** UpCart → Cart Editor / Settings → **Custom HTML**. Supports `<style>` and
@@ -38,20 +36,16 @@ prohibitions. Name the exact field / Custom HTML location for every artifact you
 
 Full reference: UpCart Public API — https://aftersell.notion.site/Upcart-Public-API-7a0f6d75cb044871bdb6da5d99cfc755
 
-- **Root every cart query at the drawer root**, so it works whether Shadow DOM is on or off:
-  ```js
-  var root = window.upcartDocumentOrShadowRoot || document;
-  root.querySelector('.upcart-product-item');
-  ```
-- **React to cart changes with the `upcartSubscribe*` family** (modern; multiple listeners
-  are safe): e.g. `window.upcartSubscribeCartLoaded(fn)`, `upcartSubscribeCartUpdated(fn)`,
+- **Root every cart query** at `window.upcartDocumentOrShadowRoot || document` so it works
+  whether Shadow DOM is on or off — see `gotchas.md`.
+- **React to cart changes with the `upcartSubscribe*` family** (multiple listeners are
+  safe): e.g. `window.upcartSubscribeCartLoaded(fn)`, `upcartSubscribeCartUpdated(fn)`,
   `upcartSubscribeItemRemoved(fn)`, `upcartSubscribeUpsellsAddedToCart(fn)`. Check the API
-  reference for the exact set. **Do not** use the deprecated single-assignment
-  `window.upcartOnCartLoaded` / `upcartOnCartUpdated` (last writer wins — they overwrite
-  each other and other apps' handlers).
-- **Re-injection:** UpCart re-renders the line DOM on every change, so any DOM you inject
-  must be re-applied on each cart event (subscribe callback) and, defensively, via a
-  `MutationObserver` on the drawer root.
+  reference for the exact set. Equivalent DOM events also fire as
+  `aftersell-upcart:public-events:*` if `addEventListener` fits better. Never the deprecated
+  `upcartOn*` callbacks — see `gotchas.md`.
+- **Re-injection:** UpCart wipes injected DOM on every re-render — re-apply on each cart
+  event; see `gotchas.md` ("DOM re-render wipes injected markup").
 - **Force a re-render** after your own `/cart/change.js` mutation: `window.upcartRefreshCart()`.
 - **Filter in-cart upsells** ("Frequently Bought Together"):
   ```js

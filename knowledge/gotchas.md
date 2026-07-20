@@ -7,9 +7,12 @@
 - If a store turns it **ON**, the cart is isolated: theme CSS no longer styles it (put cart
   CSS in the UpCart **Custom CSS** field) and `document.querySelector` will **not** find
   cart elements.
-- **Always** root cart JS at `window.upcartDocumentOrShadowRoot || document` so it works in
-  either mode. Only use plain `document` for elements **outside** the cart (theme header,
-  etc.).
+- **Always** root cart JS at the drawer root so it works in either mode:
+  ```js
+  var root = window.upcartDocumentOrShadowRoot || document;
+  root.querySelector('.upcart-product-item');
+  ```
+  Only use plain `document` for elements **outside** the cart (theme header, etc.).
 
 ## Selectors change between versions
 - `.upcart-*` are documented, comparatively stable hooks — prefer them.
@@ -40,7 +43,8 @@
 - UpCart rebuilds the line-item DOM on every cart change. Anything you inject (a badge, a
   row, a custom control) disappears on the next render. Re-apply it inside your
   `upcartSubscribe*` callback and guard against double-inject (e.g. a claimed `data-*` flag),
-  plus a `MutationObserver` fallback for renders not tied to a subscribed event.
+  plus a `MutationObserver` on the drawer root as a fallback for renders not tied to a
+  subscribed event.
 
 ## Cart line identity
 - A line item's DOM element `id` equals its Shopify **cart line key** (`<variantId>:<hash>`),
@@ -48,8 +52,7 @@
   cart line without a separate lookup.
 
 ## No Liquid in Custom HTML
-- Custom HTML modules render raw HTML/JS/CSS, **not** Liquid. Get live data at runtime from
-  `/cart.js` and `/products/{handle}.js`; never expect `{{ ... }}` to interpolate.
+- Modules render raw HTML/JS/CSS — `{{ ... }}` never interpolates. See `customization.md`.
 
 ## Coexistence with free-gift / GWP logic
 - Free-gift-with-purchase logic (theme scripts or Shopify Flow) that adds `$0` lines will
